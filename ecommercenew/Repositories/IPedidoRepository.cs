@@ -15,6 +15,7 @@ namespace Ecommercenew.Repositories
         void Adicionar(Pedido pedido);
         public Produto GetProductById(int produtoId);
         public Pedido GetById(int pedidoId);
+        public void ListarProdutos();
         public void DeletePedido(int pedidoId);
     }
 
