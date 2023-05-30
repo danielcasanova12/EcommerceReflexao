@@ -48,8 +48,8 @@ namespace Ecommercenew.UI
 
         private void CriarPedido()
         {
-            try
-            {
+            //try
+            //{
 
                 Console.WriteLine("Digite o nome do cliente:");
                 var nomeCliente = Console.ReadLine();
@@ -63,12 +63,12 @@ namespace Ecommercenew.UI
                 _gerenciador.CriarPedido(novoPedido);
                 Console.WriteLine("Pedido criado com sucesso.");
 
-            }
-            catch
-            {
-                Console.Clear();
-                Console.WriteLine("Erro ao Criar pedido");
-            }
+            //}
+            //catch
+            //{
+            //    Console.Clear();
+            //    Console.WriteLine("Erro ao Criar pedido");
+            //}
         }
 
 

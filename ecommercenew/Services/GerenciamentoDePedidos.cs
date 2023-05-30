@@ -40,7 +40,7 @@ namespace Ecommercenew.Services
 
         public void RemoverPedido(int pedidoId)
         {
-            _pedidoRepository.Delete(pedidoId);
+            _pedidoRepository.DeletePedido(pedidoId);
         }
 
         public List<Pedido> ListarPedidosPorCliente(string cliente)
@@ -77,8 +77,6 @@ namespace Ecommercenew.Services
 
             return valorTotal;
         }
-
-
         public Pedido BuscarPorID(int pedidoId)
         {
             return _pedidoRepository.GetById(pedidoId);
@@ -94,11 +92,4 @@ namespace Ecommercenew.Services
             return _itemPedidoRepository.AdicionarItem(itemPedido);
         }
     }
-
-
-
-
-
-
-
 }

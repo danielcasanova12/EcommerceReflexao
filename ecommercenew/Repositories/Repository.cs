@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Ecommercenew.Models;
-using Ecommercenew.UI;
+﻿using System.Text;
 using MySql.Data.MySqlClient;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,8 +12,52 @@ namespace Ecommercenew.Repositories
         {
             _connectionString = connectionString;
         }
+        public List<T> RetornarTodos()
+        {
+            return RetornarTodos<T>();
+        }
 
-        public T GetById(int id)
+        public List<T> RetornarTodos<T>()
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                connection.Open();
+                var query = $"SELECT * FROM tb_{typeof(T).Name.ToLower()}";
+                var command = new MySqlCommand(query, connection);
+
+                var entities = new List<T>();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var entity = Activator.CreateInstance<T>();
+                        var properties = typeof(T).GetProperties();
+
+                        foreach (var property in properties)
+                        {
+                            if (property.Name == "Id")
+                            {
+                                var id = reader.GetInt32("PedidoId");
+                                property.SetValue(entity, id);
+                                continue;
+                            }
+
+                            var value = reader[property.Name];
+                            if (value != DBNull.Value)
+                            {
+                                property.SetValue(entity, value);
+                            }
+                        }
+
+                        entities.Add(entity);
+                    }
+                }
+
+                return entities;
+            }
+        }
+        public T GetById<T>(int id)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
@@ -59,13 +95,12 @@ namespace Ecommercenew.Repositories
 
             return default;
         }
-
         public void Insert(T entity)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-                var queryBuilder = new StringBuilder($"INSERT INTO {typeof(T).Name} (");
+                var queryBuilder = new StringBuilder($"INSERT INTO tb_{typeof(T).Name} (");
                 var valuesBuilder = new StringBuilder("VALUES (");
                 var parameters = new List<MySqlParameter>();
 
@@ -78,6 +113,8 @@ namespace Ecommercenew.Repositories
 
                     string columnName = property.Name.ToLower();
                     object value = property.GetValue(entity);
+                    if (columnName == "PedidoId")
+                        columnName = "PedidoId";
 
                     queryBuilder.Append($"{columnName}, ");
                     valuesBuilder.Append($"@{columnName}, ");
@@ -139,18 +176,23 @@ namespace Ecommercenew.Repositories
 
         public void Delete(int id)
         {
-            using (var connection = new MySqlConnection(_connectionString))
+            try
             {
-                connection.Open();
-                var query = $"DELETE FROM {typeof(T).Name} WHERE PedidoId = @Id";
-                var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Id", id);
-                command.ExecuteNonQuery();
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    var query = $"DELETE FROM tb_{typeof(T).Name} WHERE PedidoId = @Id";
+                    var command = new MySqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.ExecuteNonQuery();
+                }
+                Console.WriteLine("Deletado com suseso");
             }
+            catch
+            {
+                Console.WriteLine("erro ao Deletar");
+            }
+
         }
     }
-
-   
-
-
 }

@@ -21,12 +21,12 @@ var itenspedidoUI = new ItemPedidoUI(gerenciamentoDePedidos);
 while (true)
 {
     Console.WriteLine("Selecione uma opção:");
-    Console.WriteLine("1. Criar um novo pedido");//pedido
-    Console.WriteLine("2. Adicionar itens a um pedido");//item
-    Console.WriteLine("3. Atualizar o status de um pedido");//pedido
-    Console.WriteLine("4. Remover um pedido");//pedido
-    Console.WriteLine("5. Listar pedidos por cliente, status ou data");//pedido
-    Console.WriteLine("6. Calcular o valor total de um pedido");//pedido
+    Console.WriteLine("1. Criar um novo pedido");
+    Console.WriteLine("2. Adicionar itens a um pedido");
+    Console.WriteLine("3. Atualizar o status de um pedido");
+    Console.WriteLine("4. Remover um pedido");
+    Console.WriteLine("5. Listar pedidos por cliente, status ou data");
+    Console.WriteLine("6. Calcular o valor total de um pedido");
     Console.WriteLine("0. Sair");
 
     var opcao = Console.ReadLine();

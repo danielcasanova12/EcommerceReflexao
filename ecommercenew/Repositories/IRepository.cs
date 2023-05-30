@@ -8,10 +8,14 @@ namespace Ecommercenew.Repositories
 {
     public interface IRepository<T>
     {
-        T GetById(int id);
+        T GetById<T>(int id);
         void Insert(T entity);
         void Update(T entity);
         void Delete(int id);
+        List<T> RetornarTodos();
+
+
+
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using Ecommercenew.Models;
 using MySql.Data.MySqlClient;
 using System.Configuration;
+using System.Text;
 
 namespace Ecommercenew.Repositories
 {
@@ -15,8 +16,8 @@ namespace Ecommercenew.Repositories
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-                var query = $"SELECT * FROM tb_ItemPedido WHERE PedidoId = @PedidoId";
-                var command = new MySqlCommand(query, connection);
+                var queryBuilder = new StringBuilder($"SELECT * FROM tb_ItemPedido WHERE PedidoId = @PedidoId");
+                var command = new MySqlCommand(queryBuilder.ToString(), connection);
                 command.Parameters.AddWithValue("@PedidoId", pedidoId);
 
                 var itensPedido = new List<ItemPedido>();
@@ -25,20 +26,28 @@ namespace Ecommercenew.Repositories
                 {
                     while (reader.Read())
                     {
-                        var itemPedido = new ItemPedido
+                        var itemPedido = new ItemPedido();
+
+                        var properties = typeof(ItemPedido).GetProperties();
+
+                        foreach (var property in properties)
                         {
-                            Id = reader.GetInt32("ItemPedidoId"),
-                            Quantidade = reader.GetInt32("quantidade"),
-                            PrecoUnitario = reader.GetDecimal("preco_unitario")
-                        };
+                            var columnName = property.Name;
+                            var value = reader[columnName];
+
+                            if (value != DBNull.Value)
+                            {
+                                property.SetValue(itemPedido, value);
+                            }
+                        }
 
                         var pedidoRepository = new PedidoRepository(_connectionString);
-                        var pedido = pedidoRepository.GetById(pedidoId);
+                        var pedido = pedidoRepository.GetById<Pedido>(pedidoId);
                         itemPedido.Pedido = pedido;
 
                         var produtoId = reader.GetInt32("ProdutoId");
                         var produtoRepository = new PedidoRepository(_connectionString);
-                        var produto = produtoRepository.GetProductById(produtoId);
+                        var produto = produtoRepository.GetById<Produto>(produtoId);
                         itemPedido.Produto = produto;
 
                         itensPedido.Add(itemPedido);
@@ -48,22 +57,12 @@ namespace Ecommercenew.Repositories
                 return itensPedido;
             }
         }
+
         public bool AdicionarItem(ItemPedido itemPedido)
         {
             try
             {
-                using (var connection = new MySqlConnection(_connectionString))
-                {
-                    connection.Open();
-                    var query = "INSERT INTO tb_itempedido (ItemPedidoId, ProdutoId, Quantidade, preco_unitario, PedidoId) VALUES (@ItemPedidoId, @ProdutoId, @Quantidade, @PrecoUnitario, @PedidoId);";
-                    var command = new MySqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@ItemPedidoId", itemPedido.Id);
-                    command.Parameters.AddWithValue("@ProdutoId", itemPedido.Produto.ProdutoId);
-                    command.Parameters.AddWithValue("@Quantidade", itemPedido.Quantidade);
-                    command.Parameters.AddWithValue("@PrecoUnitario", itemPedido.Produto.Preco);
-                    command.Parameters.AddWithValue("@PedidoId", itemPedido.Pedido.PedidoId);
-                    command.ExecuteNonQuery();
-                }
+                Insert(itemPedido);
 
                 Console.Clear();
                 Console.WriteLine("Produto adicionado ao pedido");
@@ -78,6 +77,7 @@ namespace Ecommercenew.Repositories
                 return false;
             }
         }
+
 
 
 
