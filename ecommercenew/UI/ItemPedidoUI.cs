@@ -58,6 +58,7 @@ namespace Ecommercenew.UI
                     {
                         Pedido = pedido,
                         Produto = produto,
+                        PrecoUnitario = 11,
                         Quantidade = quantidade
                     };
                     adicionar = _gerenciamentoDePedidos.AdicionarItemPedido(novoItemPedido);
@@ -67,7 +68,7 @@ namespace Ecommercenew.UI
             catch
             {
                 Console.Clear();
-                Console.WriteLine("Erro iD(s) digitado(s) não valido(s)");
+               Console.WriteLine("Erro iD(s) digitado(s) não valido(s)");
             }
         }
 

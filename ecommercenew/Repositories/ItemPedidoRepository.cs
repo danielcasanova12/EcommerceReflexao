@@ -16,8 +16,8 @@ namespace Ecommercenew.Repositories
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-                var queryBuilder = new StringBuilder($"SELECT * FROM tb_ItemPedido WHERE PedidoId = @PedidoId");
-                var command = new MySqlCommand(queryBuilder.ToString(), connection);
+                var query = $"SELECT * FROM tb_ItemPedido WHERE PedidoId = @PedidoId";
+                var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@PedidoId", pedidoId);
 
                 var itensPedido = new List<ItemPedido>();
@@ -26,28 +26,20 @@ namespace Ecommercenew.Repositories
                 {
                     while (reader.Read())
                     {
-                        var itemPedido = new ItemPedido();
-
-                        var properties = typeof(ItemPedido).GetProperties();
-
-                        foreach (var property in properties)
+                        var itemPedido = new ItemPedido
                         {
-                            var columnName = property.Name;
-                            var value = reader[columnName];
-
-                            if (value != DBNull.Value)
-                            {
-                                property.SetValue(itemPedido, value);
-                            }
-                        }
+                            Id = reader.GetInt32("ItemPedidoId"),
+                            Quantidade = reader.GetInt32("quantidade"),
+                            PrecoUnitario = reader.GetDecimal("preco_unitario")
+                        };
 
                         var pedidoRepository = new PedidoRepository(_connectionString);
-                        var pedido = pedidoRepository.GetById<Pedido>(pedidoId);
+                        var pedido = pedidoRepository.GetById(pedidoId);
                         itemPedido.Pedido = pedido;
 
                         var produtoId = reader.GetInt32("ProdutoId");
                         var produtoRepository = new PedidoRepository(_connectionString);
-                        var produto = produtoRepository.GetById<Produto>(produtoId);
+                        var produto = produtoRepository.GetProductById(produtoId);
                         itemPedido.Produto = produto;
 
                         itensPedido.Add(itemPedido);
@@ -57,7 +49,6 @@ namespace Ecommercenew.Repositories
                 return itensPedido;
             }
         }
-
         public bool AdicionarItem(ItemPedido itemPedido)
         {
             try
@@ -69,7 +60,7 @@ namespace Ecommercenew.Repositories
                 return true;
             }
             catch
-            {
+           {
                 Console.Clear();
                 Console.WriteLine();
                 Console.WriteLine("Erro: ID do pedido ou produto não existe");

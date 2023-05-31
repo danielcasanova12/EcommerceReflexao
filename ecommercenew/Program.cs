@@ -12,6 +12,7 @@ var services = new ServiceCollection();
 
 services.AddTransient<IPedidoRepository>(provider => new PedidoRepository(connectionString));
 services.AddTransient<IItemPedidoRepository>(provider => new ItemPedidoRepository(connectionString));
+services.AddTransient<IProdutoRepository>(provider => new ProdutoRepository(connectionString));
 services.AddTransient<GerenciamentoDePedidos>();
 
 var serviceProvider = services.BuildServiceProvider();

@@ -16,19 +16,10 @@ namespace Ecommercenew.Repositories
     public class PedidoRepository : Repository<Pedido>, IPedidoRepository
     {
         
-        private string _connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
         public PedidoRepository(string connectionString) : base(connectionString)
         {
         }
-        public void ListarProdutos()
-        {
-            var entities = RetornarTodos<Pedido>();
 
-            foreach (var entity in entities)
-            {
-                Console.WriteLine(entity.PedidoId.ToString());
-            }
-        }
 
 
 
@@ -46,10 +37,22 @@ namespace Ecommercenew.Repositories
         public void Adicionar(Pedido pedido)
         {
             Insert(pedido);
-            //Console.WriteLine("Seu id é : " + pedido.PedidoId);
+            Console.WriteLine("Seu id é : " + ObterUltimoIdPedido());
         }
 
-
+        public int ObterUltimoIdPedido()
+        {
+            var pedidos = RetornarTodos<Pedido>();
+            if (pedidos.Count > 0)
+            {
+                pedidos.Sort((p1, p2) => p2.PedidoId.CompareTo(p1.PedidoId));
+                return pedidos[0].PedidoId;
+            }
+            else
+            {
+                return 0; // ou algum valor padrão que você deseje retornar caso não haja pedidos
+            }
+        }
         public List<Pedido> GetByCliente(string cliente)
         {
             return RetornarTodos<Pedido>().Where(p => p.Cliente == cliente).ToList();

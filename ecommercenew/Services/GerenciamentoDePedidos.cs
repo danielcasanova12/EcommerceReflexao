@@ -10,12 +10,14 @@ namespace Ecommercenew.Services
     public class GerenciamentoDePedidos
     {
         private readonly IPedidoRepository _pedidoRepository;
+        private IProdutoRepository _produtoRepository;
         private readonly IItemPedidoRepository _itemPedidoRepository;
 
-        public GerenciamentoDePedidos(IPedidoRepository pedidoRepository, IItemPedidoRepository itemPedidoRepository)
+        public GerenciamentoDePedidos(IPedidoRepository pedidoRepository, IItemPedidoRepository itemPedidoRepository, IProdutoRepository produtoRepository)
         {
             _pedidoRepository = pedidoRepository;
             _itemPedidoRepository = itemPedidoRepository;
+            _produtoRepository = produtoRepository;
         }
 
         public void CriarNovoPedido(Pedido pedido)
@@ -63,7 +65,7 @@ namespace Ecommercenew.Services
         }
         public void ListarTodosOsProdutos()
         {
-            _pedidoRepository.ListarProdutos();
+            _produtoRepository.ListarProdutos();
         }
         public decimal CalcularValorTotalPedido(int pedidoId)
         {

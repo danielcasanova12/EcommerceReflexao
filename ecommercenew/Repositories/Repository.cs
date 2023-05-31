@@ -7,6 +7,7 @@ namespace Ecommercenew.Repositories
     public class Repository<T> : IRepository<T>
     {
         private readonly string _connectionString;
+        private int precoUnitario = 11;
 
         public Repository(string connectionString)
         {
@@ -62,7 +63,9 @@ namespace Ecommercenew.Repositories
             using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
-                var query = $"SELECT * FROM tb_{typeof(T).Name.ToLower()} WHERE PedidoId = @Id";
+                var tableName = typeof(T).Name.ToLower();
+                var idColumnName = tableName == "pedido" ? "PedidoId" : "ProdutoId";
+                var query = $"SELECT * FROM tb_{tableName} WHERE {idColumnName} = @Id";
                 var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", id);
 
@@ -81,7 +84,14 @@ namespace Ecommercenew.Repositories
                                 continue;
                             }
 
-                            var value = reader[property.Name];
+                            var columnName = property.Name;
+
+                            if (columnName == "PedidoId" && idColumnName == "ProdutoId")
+                            {
+                                columnName = "ProdutoId";
+                            }
+
+                            var value = reader[columnName];
                             if (value != DBNull.Value)
                             {
                                 property.SetValue(entity, value);
@@ -95,6 +105,7 @@ namespace Ecommercenew.Repositories
 
             return default;
         }
+
         public void Insert(T entity)
         {
             using (var connection = new MySqlConnection(_connectionString))
@@ -113,9 +124,23 @@ namespace Ecommercenew.Repositories
 
                     string columnName = property.Name.ToLower();
                     object value = property.GetValue(entity);
-                    if (columnName == "PedidoId")
-                        columnName = "PedidoId";
+                    if (columnName == "produto")
+                    {
+                        columnName = "ProdutoId";
+                        value = ((Ecommercenew.Models.Produto)value).ProdutoId;
+                    }
+                    if (columnName == "precounitario")
+                    {
+                        columnName = "preco_unitario";
+                        value = precoUnitario;
+                    }
 
+
+                    if (columnName == "pedido")
+                    {
+                        columnName = "PedidoId";
+                        value = ((Ecommercenew.Models.Pedido)value).PedidoId;
+                    }
                     queryBuilder.Append($"{columnName}, ");
                     valuesBuilder.Append($"@{columnName}, ");
 
@@ -130,12 +155,12 @@ namespace Ecommercenew.Repositories
                 valuesBuilder.Append(")");
 
                 var query = queryBuilder.ToString() + valuesBuilder.ToString();
-
                 var command = new MySqlCommand(query, connection);
                 command.Parameters.AddRange(parameters.ToArray());
                 command.ExecuteNonQuery();
             }
         }
+
 
         public void Update(T entity)
         {
