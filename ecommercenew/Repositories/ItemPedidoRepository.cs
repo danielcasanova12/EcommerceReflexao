@@ -1,6 +1,8 @@
 ﻿using Ecommercenew.Models;
+using Ecommercenew.UI;
 using MySql.Data.MySqlClient;
 using System.Configuration;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace Ecommercenew.Repositories
@@ -11,44 +13,7 @@ namespace Ecommercenew.Repositories
         {
         }
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-        public List<ItemPedido> GetByPedido(int pedidoId)
-        {
-            using (var connection = new MySqlConnection(_connectionString))
-            {
-                connection.Open();
-                var query = $"SELECT * FROM tb_ItemPedido WHERE PedidoId = @PedidoId";
-                var command = new MySqlCommand(query, connection);
-                command.Parameters.AddWithValue("@PedidoId", pedidoId);
 
-                var itensPedido = new List<ItemPedido>();
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var itemPedido = new ItemPedido
-                        {
-                            Id = reader.GetInt32("ItemPedidoId"),
-                            Quantidade = reader.GetInt32("quantidade"),
-                            PrecoUnitario = reader.GetDecimal("preco_unitario")
-                        };
-
-                        var pedidoRepository = new PedidoRepository(_connectionString);
-                        var pedido = pedidoRepository.GetById(pedidoId);
-                        itemPedido.Pedido = pedido;
-
-                        var produtoId = reader.GetInt32("ProdutoId");
-                        var produtoRepository = new PedidoRepository(_connectionString);
-                        var produto = produtoRepository.GetProductById(produtoId);
-                        itemPedido.Produto = produto;
-
-                        itensPedido.Add(itemPedido);
-                    }
-                }
-
-                return itensPedido;
-            }
-        }
         public bool AdicionarItem(ItemPedido itemPedido)
         {
             try

@@ -9,7 +9,6 @@ namespace Ecommercenew.Repositories
 {
     public interface IItemPedidoRepository : IRepository<ItemPedido>
     {
-        List<ItemPedido> GetByPedido(int pedidoId);
          bool AdicionarItem(ItemPedido itemPedido);
     }
 

@@ -15,24 +15,16 @@ namespace Ecommercenew.Repositories
 
     public class PedidoRepository : Repository<Pedido>, IPedidoRepository
     {
+
         
         public PedidoRepository(string connectionString) : base(connectionString)
         {
         }
 
-
-
-
-
-
-
         public Pedido GetById(int pedidoId)
         {
             return GetById<Pedido>(pedidoId);
         }
-
-
-
 
         public void Adicionar(Pedido pedido)
         {
@@ -50,7 +42,7 @@ namespace Ecommercenew.Repositories
             }
             else
             {
-                return 0; // ou algum valor padrão que você deseje retornar caso não haja pedidos
+                return 0; 
             }
         }
         public List<Pedido> GetByCliente(string cliente)
